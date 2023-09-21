@@ -78,11 +78,13 @@ class Piramide:Objeto3D
     {
       glBegin(GL_QUADS);
       {
-        glNormal3f (0.0, 1.0, 0.0);
-        glVertex3f (lado, 0.0, 0.0);
+        glNormal3f (0.0, -1.0, 0.0);
+        
         glVertex3f (0.0, 0.0, 0.0);
-        glVertex3f (0.0, 0.0, lado);
+        glVertex3f (lado, 0.0, 0.0);
         glVertex3f (lado, 0.0, lado);
+        glVertex3f (0.0, 0.0, lado);
+
       }
       glEnd();
 
@@ -141,9 +143,9 @@ class Cubo:Objeto3D
 
         glNormal3f(0.0, -1.0, 0.0);
         glVertex3f(0.0, 0.0, 0.0);
-        glVertex3f(0.0, 0.0, lado);
-        glVertex3f(lado, 0.0, lado);
         glVertex3f(lado, 0.0, 0.0);
+        glVertex3f(lado, 0.0, lado);
+        glVertex3f(0.0, 0.0, lado);
       }
       glEnd();
     }
@@ -157,143 +159,124 @@ class Teseracto:Objeto3D
 
     void draw()
     {
-      float color[4] = { 0.2, 0.5, 1, opacity };                    // ES RGB y el último es el transparente
+      float color[4] = { 0.2, 0.5, 1, 1};                    // ES RGB y el último es el transparente
       glMaterialfv (GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
       glBegin (GL_QUAD_STRIP);
-      {				/* Caras transversales */
-              //NORMAL es un vector perpendicular a la superficie. Es importante la normal, ya que se indica que parte en la superficie se calcule la iluminación.
-              //VERTElado son vertices
-              //La terminación 3f, es para indicar que vamos parametros le vamos a pasar.
-              //GL_QUAD_STRIP 
-        glNormal3f (0.0, 0.0, 1.0);	/*Vertical delantera */
-        glVertelado3f (lado/2, lado/2, lado/2);
-        glVertex3f (0, y, z);
-        glVertex3f (x, 0, z);
-        glVertex3f (0, 0, z);
-        glNormal3f (0.0, -1.0, 0.0);	/*Inferior */
-        glVertex3f (x, 0, 0);
+      {				
+        glNormal3f (0.0, 0.0, 1.0);	
+        glVertex3f (lado/2, lado/2, lado/2);
+        glVertex3f (0, lado/2, lado/2);
+        glVertex3f (lado/2, 0, lado/2);
+        glVertex3f (0, 0, lado/2);
+        glNormal3f (0.0, -1.0, 0.0);	
+        glVertex3f (lado/2, 0, 0);
         glVertex3f (0, 0, 0);
-        glNormal3f (0.0, 0.0, -1.0);	/* Vertical hacia atras */
-        glVertex3f (x, y, 0);
-        glVertex3f (0, y, 0);
-        glNormal3f (0.0, 1.0, 0.0);	/* Superior, horizontal */
-        glVertex3f (x, y, z);
-        glVertex3f (0, y, z);
+        glNormal3f (0.0, 0.0, -1.0);	
+        glVertex3f (lado/2, lado/2, 0);
+        glVertex3f (0, lado/2, 0);
+        glNormal3f (0.0, 1.0, 0.0);	
+        glVertex3f (lado/2, lado/2, lado/2);
+        glVertex3f (0, lado/2, lado/2);
       }
       glEnd ();
       glBegin (GL_QUADS);
-      {				/* Costados */
+      {				
         glNormal3f (1.0, 0.0, 0.0);
-        glVertex3f (x, 0, 0);
-        glVertex3f (x, y, 0);
-        glVertex3f (x, y, z);
-        glVertex3f (x, 0, z);
+        glVertex3f (lado/2, 0, 0);
+        glVertex3f (lado/2, lado/2, 0);
+        glVertex3f (lado/2, lado/2, lado/2);
+        glVertex3f (lado/2, 0, lado/2);
         glNormal3f (-1.0, 0.0, 0.0);
         glVertex3f (0, 0, 0);
-        glVertex3f (0, 0, z);
-        glVertex3f (0, y, z);
-        glVertex3f (0, y, 0);
+        glVertex3f (0, 0, lado/2);
+        glVertex3f (0, lado/2, lado/2);
+        glVertex3f (0, lado/2, 0);
       }
       glEnd ();
 
-      float color[4] = { 0.0, 0.0, 0.0, 35 };                    // ES RGB y el último es el transparente
-      glMaterialfv (GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
+      float color1[4] = { 1, 1, 1, 1 };                    // ES RGB y el último es el transparente
+      glMaterialfv (GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color1);
 
       glBegin(GL_LINES);
       {
         glVertex3f(lado/2+(lado/2)/2,-lado/2+(lado/2)/2,lado/2+(lado/2)/2);
-        glVertex3f(-x/2+(lado/2)/2,-y/2+(lado/2)/2,z/2+(lado/2)/2);
+        glVertex3f(-lado/2+(lado/2)/2,-lado/2+(lado/2)/2,lado/2+(lado/2)/2);
 
-        glVertex3f(x/2+(lado/2)/2,-y/2+(lado/2)/2,z/2+(lado/2)/2);
-        glVertex3f(cubo_x, 0.0 ,cubo_z);
+        glVertex3f(lado/2+(lado/2)/2,-lado/2+(lado/2)/2,lado/2+(lado/2)/2);
+        glVertex3f(lado/2, 0.0 ,lado/2);
 
-        glVertex3f(-x/2+(lado/2)/2,-y/2+(lado/2)/2,z/2+(lado/2)/2);
-        glVertex3f( 0.0, 0.0, cubo_z);
+        glVertex3f(-lado/2+(lado/2)/2,-lado/2+(lado/2)/2,lado/2+(lado/2)/2);
+        glVertex3f( 0.0, 0.0, lado/2);
 
-        glVertex3f(x/2+(lado/2)/2,-y/2+(lado/2)/2,z/2+(lado/2)/2);
-        glVertex3f(x/2+(lado/2)/2,-y/2+(lado/2)/2,-z/2+(lado/2)/2 );
+        glVertex3f(lado/2+(lado/2)/2,-lado/2+(lado/2)/2,lado/2+(lado/2)/2);
+        glVertex3f(lado/2+(lado/2)/2,-lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
 
-        glVertex3f(x/2+(lado/2)/2,-y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-        glVertex3f(cubo_x,0.0,0.0);
+        glVertex3f(lado/2+(lado/2)/2,-lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
+        glVertex3f(lado/2,0.0,0.0);
 
-        glVertex3f(x/2+(lado/2)/2,-y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-        glVertex3f(-x/2+(lado/2)/2,-y/2+(lado/2)/2,-z/2+(lado/2)/2 );
+        glVertex3f(lado/2+(lado/2)/2,-lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
+        glVertex3f(-lado/2+(lado/2)/2,-lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
 
-        glVertex3f(-x/2+(lado/2)/2,-y/2+(lado/2)/2,-z/2+(lado/2)/2 );
+        glVertex3f(-lado/2+(lado/2)/2,-lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
         glVertex3f(0.0, 0.0 ,0.0 );
 
-        glVertex3f(-x/2+(lado/2)/2,-y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-        glVertex3f(-x/2+(lado/2)/2,-y/2+(lado/2)/2,z/2+(lado/2)/2 );
+        glVertex3f(-lado/2+(lado/2)/2,-lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
+        glVertex3f(-lado/2+(lado/2)/2,-lado/2+(lado/2)/2,lado/2+(lado/2)/2 );
 
-        glVertex3f(-x/2+(lado/2)/2,-y/2+(lado/2)/2,z/2+(lado/2)/2 );
-        glVertex3f (0.0, 0.0, cubo_z);
+        glVertex3f(-lado/2+(lado/2)/2,-lado/2+(lado/2)/2,lado/2+(lado/2)/2 );
+        glVertex3f (0.0, 0.0, lado/2);
 
 
-        //Parte Arriba
-        glVertex3f(x/2+(lado/2)/2,y/2+(lado/2)/2,z/2+(lado/2)/2);
-        glVertex3f(-x/2+(lado/2)/2,y/2+(lado/2)/2,z/2+(lado/2)/2);
-
-        glVertex3f(x/2+(lado/2)/2,y/2+(lado/2)/2,z/2+(lado/2)/2);
-        glVertex3f(cubo_x, cubo_y ,cubo_z);
-
-        glVertex3f(-x/2+(lado/2)/2,y/2+(lado/2)/2,z/2+(lado/2)/2);
-        glVertex3f( 0.0, cubo_y, cubo_z);
-
-        glVertex3f(x/2+(lado/2)/2,y/2+(lado/2)/2,z/2+(lado/2)/2);
-        glVertex3f(x/2+(lado/2)/2,y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-
-        glVertex3f(x/2+(lado/2)/2,y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-        glVertex3f(cubo_x,cubo_y,0.0);
-
-        glVertex3f(x/2+(lado/2)/2,y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-        glVertex3f(-x/2+(lado/2)/2,y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-
-        glVertex3f(-x/2+(lado/2)/2,y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-        glVertex3f(0.0, cubo_y ,0.0 );
-
-        glVertex3f(-x/2+(lado/2)/2,y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-        glVertex3f(-x/2+(lado/2)/2,y/2+(lado/2)/2,z/2+(lado/2)/2 );
-
-        glVertex3f(-x/2+(lado/2)/2,y/2+(lado/2)/2,z/2+(lado/2)/2 );
-        glVertex3f (0.0, cubo_y, cubo_z);
-
-        //Union
-        glVertex3f(x/2+(lado/2)/2,y/2+(lado/2)/2,z/2+(lado/2)/2);
-        glVertex3f(x/2+(lado/2)/2,-y/2+(lado/2)/2,z/2+(lado/2)/2);
-
-        glVertex3f(-x/2+(lado/2)/2,y/2+(lado/2)/2,z/2+(lado/2)/2);
-        glVertex3f(-x/2+(lado/2)/2,-y/2+(lado/2)/2,z/2+(lado/2)/2);
-
-        glVertex3f(x/2+(lado/2)/2,y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-        glVertex3f(x/2+(lado/2)/2,-y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-
-        glVertex3f(-x/2+(lado/2)/2,y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-        glVertex3f(-x/2+(lado/2)/2,-y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-      }
-      glEnd();
-
-      float color1[4]={25.0,0.0,0.0,1.0};
-      glMaterialfv (GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
-      glBegin(GL_POINTS);
-      {
         
+        glVertex3f(lado/2+(lado/2)/2,lado/2+(lado/2)/2,lado/2+(lado/2)/2);
+        glVertex3f(-lado/2+(lado/2)/2,lado/2+(lado/2)/2,lado/2+(lado/2)/2);
 
-        glVertex3f(x/2+(lado/2)/2,y/2+(lado/2)/2,z/2+(lado/2)/2);
-        glVertex3f(x/2+(lado/2)/2,-y/2+(lado/2)/2,z/2+(lado/2)/2);
+        glVertex3f(lado/2+(lado/2)/2,lado/2+(lado/2)/2,lado/2+(lado/2)/2);
+        glVertex3f(lado/2, lado/2 ,lado/2);
 
-        glVertex3f(-x/2+(lado/2)/2,y/2+(lado/2)/2,z/2+(lado/2)/2);
-        glVertex3f(-x/2+(lado/2)/2,-y/2+(lado/2)/2,z/2+(lado/2)/2);
+        glVertex3f(-lado/2+(lado/2)/2,lado/2+(lado/2)/2,lado/2+(lado/2)/2);
+        glVertex3f( 0.0, lado/2, lado/2);
 
-        glVertex3f(x/2+(lado/2)/2,y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-        glVertex3f(x/2+(lado/2)/2,-y/2+(lado/2)/2,-z/2+(lado/2)/2 );
+        glVertex3f(lado/2+(lado/2)/2,lado/2+(lado/2)/2,lado/2+(lado/2)/2);
+        glVertex3f(lado/2+(lado/2)/2,lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
 
-        glVertex3f(-x/2+(lado/2)/2,y/2+(lado/2)/2,-z/2+(lado/2)/2 );
-        glVertex3f(-x/2+(lado/2)/2,-y/2+(lado/2)/2,-z/2+(lado/2)/2 );
+        glVertex3f(lado/2+(lado/2)/2,lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
+        glVertex3f(lado/2,lado/2,0.0);
+
+        glVertex3f(lado/2+(lado/2)/2,lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
+        glVertex3f(-lado/2+(lado/2)/2,lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
+
+        glVertex3f(-lado/2+(lado/2)/2,lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
+        glVertex3f(0.0, lado/2 ,0.0 );
+
+        glVertex3f(-lado/2+(lado/2)/2,lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
+        glVertex3f(-lado/2+(lado/2)/2,lado/2+(lado/2)/2,lado/2+(lado/2)/2 );
+
+        glVertex3f(-lado/2+(lado/2)/2,lado/2+(lado/2)/2,lado/2+(lado/2)/2 );
+        glVertex3f (0.0, lado/2, lado/2);
+
+        
+        glVertex3f(lado/2+(lado/2)/2,lado/2+(lado/2)/2,lado/2+(lado/2)/2);
+        glVertex3f(lado/2+(lado/2)/2,-lado/2+(lado/2)/2,lado/2+(lado/2)/2);
+
+        glVertex3f(-lado/2+(lado/2)/2,lado/2+(lado/2)/2,lado/2+(lado/2)/2);
+        glVertex3f(-lado/2+(lado/2)/2,-lado/2+(lado/2)/2,lado/2+(lado/2)/2);
+
+        glVertex3f(lado/2+(lado/2)/2,lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
+        glVertex3f(lado/2+(lado/2)/2,-lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
+
+        glVertex3f(-lado/2+(lado/2)/2,lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
+        glVertex3f(-lado/2+(lado/2)/2,-lado/2+(lado/2)/2,-lado/2+(lado/2)/2 );
       }
       glEnd();
 
     }
-}
+
+    float getAltura()
+    {
+      return lado/2 - (lado/2)/2;
+    }
+};
 
 class Ejes:Objeto3D 
 { 
@@ -325,6 +308,7 @@ class Ejes:Objeto3D
 Ejes ejesCoordenadas;
 Cubo cubo;
 Piramide piramide;
+Teseracto teseracto;
 
 
 /**	void Dibuja( void )
@@ -342,7 +326,7 @@ void Dibuja (void)
 
   glPushMatrix ();		// Apila la transformacion geometrica actual
 
-  glClearColor (1.0, 1.0, 1.0, 1.0);	// Fija el color de fondo a negro
+  glClearColor (0.0, 0.0, 0.0, 1.0);	// Fija el color de fondo a negro
 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Inicializa el buffer de color y el Z-Buffer
 
@@ -371,6 +355,10 @@ void Dibuja (void)
   glTranslatef(10, 0, 0);
 
   piramide.draw();
+
+  glTranslatef(10, teseracto.getAltura(),teseracto.getAltura());
+
+  teseracto.draw();
 
   glPopMatrix ();		// Desapila la transformacion geometrica
 
