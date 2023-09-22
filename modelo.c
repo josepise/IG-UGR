@@ -332,6 +332,8 @@ void Dibuja (void)
 
   transformacionVisualizacion ();	// Carga transformacion de visualizacion
 
+  glShadeModel(GL_FLAT);
+
   glLightfv (GL_LIGHT0, GL_POSITION, pos);	// Declaracion de luz. Colocada aqui esta fija en la escena
 
   ejesCoordenadas.draw();			// Dibuja los ejes
