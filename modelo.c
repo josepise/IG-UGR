@@ -36,7 +36,6 @@ modulo modelo.c
 #include <GL/glut.h>		// Libreria de utilidades de OpenGL
 #include "practicasIG.h"
 
-
 /**	void initModel()
 
 Inicializa el modelo y de las variables globales
@@ -112,6 +111,11 @@ class Cubo:Objeto3D
 	public:
     float lado=5.0;
 
+    Cubo (float l)
+    {
+      lado=l;
+    }
+
 	  void draw()
     {
       glBegin(GL_QUAD_STRIP);
@@ -137,8 +141,8 @@ class Cubo:Objeto3D
       {
         glNormal3f(0.0, 1.0, 0.0);
         glVertex3f(0.0, lado, 0.0);
-        glVertex3f(0.0, lado, lado);
         glVertex3f(lado, lado, lado);
+        glVertex3f(0.0, lado, lado);
         glVertex3f(lado, lado, 0.0);
 
         glNormal3f(0.0, -1.0, 0.0);
@@ -278,6 +282,161 @@ class Teseracto:Objeto3D
     }
 };
 
+class Malla:Objeto3D
+{
+  private:
+    std::vector<std::vector<float>> vertices;
+    std::vector<std::vector<float>> normales;
+    std::vector<std::vector<float>> normales_vert;
+    std::vector<std::vector<int>> caras;
+
+  public:
+
+  Malla(char * st)
+  {
+    std::vector<float> vert,tmp;
+    std::vector<int> po,car;
+
+    ply::read(st,vert,po);
+    std::vector<int>::iterator it=po.begin();
+
+
+    for(it; it!=po.end(); ++it)
+    {
+      car.push_back((*it));
+
+      if(car.size()==3)
+      {
+        caras.push_back(car);
+        car.clear();
+      }
+    }
+
+    for(int i=0; i<vert.size(); i++)
+    {
+      tmp.push_back(vert[i]);
+      
+      if(tmp.size()==3)
+      {
+        vertices.push_back(tmp);
+        tmp.clear();
+      }
+    } 
+
+    for(int i=0; i<caras.size(); i++)
+      normales.push_back({0,0,0});
+    
+    for(int i=0; i<vertices.size(); i++)
+      normales_vert.push_back({0,0,0});
+   
+  }
+
+
+  void draw()
+  {
+
+      glBegin(GL_TRIANGLES);
+      {
+        for(int i=0; i<caras.size(); i++)
+        {
+            normalCaras(vertices[caras[i][0]],vertices[caras[i][1]],vertices[caras[i][2]],i);
+            glNormal3f(normales[i][0],normales[i][1],normales[i][2]);
+            
+            for(int j=0; j<3; j++)
+              glVertex3f(vertices[caras[i][j]][0],vertices[caras[i][j]][1],vertices[caras[i][j]][2]);
+        }
+
+      }
+      glEnd();
+  }
+
+  void draw_smooth()
+  {
+    glShadeModel(GL_SMOOTH);
+   
+    for(int i=0; i<caras.size(); i++)
+      normalCaras(vertices[caras[i][0]],vertices[caras[i][1]],vertices[caras[i][2]],i);
+
+    normalVertices();
+    glBegin(GL_TRIANGLES);
+    {
+      
+      for(int i=0; i<caras.size();i++)
+      { 
+        for(int j=0; j<3; j++)
+        {
+          glNormal3f(normales_vert[caras[i][j]][0],normales_vert[caras[i][j]][1],normales_vert[caras[i][j]][2]);  
+          glVertex3f(vertices[caras[i][j]][0],vertices[caras[i][j]][1],vertices[caras[i][j]][2]);
+        }
+      }
+    }
+    glEnd();
+       
+  }
+
+  void normalCaras (std::vector<float> punto1,std::vector<float> punto2,std::vector<float> punto3, int cara)
+  {
+      std::vector<float> vector0;
+      std::vector<float> vector1;
+      std::vector<float> norm;
+      float i,j,k;
+
+      for(int i=0; i<3; i++)
+      {  
+        vector0.push_back(punto2[i]-punto1[i]);
+        vector1.push_back(punto3[i]-punto1[i]);
+      }
+      i=vector0[1]*vector1[2]-vector0[2]*vector1[1];
+      j=vector0[2]*vector1[0]-vector0[0]*vector1[2];
+      k=vector0[0]*vector1[1]-vector0[1]*vector1[0];
+
+      
+    
+      normales[cara][0]=i;
+      normales[cara][1]=j;
+      normales[cara][2]=k;
+
+
+      float mod=sqrt(pow(normales[cara][0],2)+pow(normales[cara][1],2)+pow(normales[cara][2],2));
+
+      if(mod>0)
+      {
+        normales[cara][0]=normales[cara][0]/mod;
+        normales[cara][1]=normales[cara][1]/mod;
+        normales[cara][2]=normales[cara][2]/mod;
+      }
+  }
+
+  void normalVertices()
+  {
+
+      for(int i=0; i<caras.size();i++)
+      {
+        for(int j=0; j<3;j++)
+        {
+          normales_vert[caras[i][j]][0]+=normales[i][0];
+          normales_vert[caras[i][j]][1]+=normales[i][1];
+          normales_vert[caras[i][j]][2]+=normales[i][2];
+        }
+      }  
+
+      for(int i=0; i<normales_vert.size(); i++)
+      {
+        float mod=sqrt(pow(normales_vert[i][0],2)+pow(normales_vert[i][1],2)+pow(normales_vert[i][2],2));
+
+        if(mod>0)
+        {
+          normales_vert[i][0]=normales_vert[i][0]/mod;
+          normales_vert[i][1]=normales_vert[i][1]/mod;
+          normales_vert[i][2]=normales_vert[i][2]/mod;
+        }
+      }
+
+  }
+
+  
+};
+
 class Ejes:Objeto3D 
 { 
   public: 
@@ -305,10 +464,14 @@ class Ejes:Objeto3D
     }
 }; 
 
+
+
+char * beeth="./beethoven.ply";
 Ejes ejesCoordenadas;
-Cubo cubo;
+Cubo cubo(5);
 Piramide piramide;
 Teseracto teseracto;
+Malla bety(beeth);
 
 
 /**	void Dibuja( void )
@@ -332,7 +495,7 @@ void Dibuja (void)
 
   transformacionVisualizacion ();	// Carga transformacion de visualizacion
 
-  glShadeModel(GL_FLAT);
+  //glShadeModel(GL_FLAT);
 
   glLightfv (GL_LIGHT0, GL_POSITION, pos);	// Declaracion de luz. Colocada aqui esta fija en la escena
 
@@ -351,16 +514,16 @@ void Dibuja (void)
 
   // Dibuja el modelo (A rellenar en prácticas 1,2 y 3)  
 
-  cubo.draw();   
+  bety.draw_smooth();   
 
   glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, color2);
-  glTranslatef(10, 0, 0);
+  
+  //glTranslatef(10, 0, 0);
+  //piramide.draw();
 
-  piramide.draw();
-
-  glTranslatef(10, teseracto.getAltura(),teseracto.getAltura());
-
-  teseracto.draw();
+  
+  //glTranslatef(10, teseracto.getAltura(),teseracto.getAltura());
+  //teseracto.draw();
 
   glPopMatrix ();		// Desapila la transformacion geometrica
 
