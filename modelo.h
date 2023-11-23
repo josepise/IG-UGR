@@ -27,6 +27,8 @@
 	 modelo.h
 */
 
+
+
 /**
 	Funcion de redibujado. Se ejecuta con los eventos postRedisplay
 **/
@@ -45,6 +47,9 @@ void initModel ();
 void setModo(int M);
 
 void setIlum();
+void setRebobinar(bool modo);
+void setPreder(bool modo);
+
 
 
 class Objeto3D 
@@ -52,6 +57,7 @@ class Objeto3D
 	public: 
 	virtual void draw( ) = 0; // Dibuja el objeto
 } ;
+
 
 
 

@@ -46,8 +46,11 @@ void printHelp ()
   printf ("\n\n Dpto. Lenguajes y Sistemas Informaticos");
   printf ("\n E.T.S.I. Informatica		Univ. de Granada ");
   printf ("\n");
+  printf ("\n Reloj que se encuentra de base en la misma hora que el sistema.");
   printf ("\n Opciones: \n\n");
   printf ("h, H: Imprime informacion de ayuda \n");
+  printf ("r, R: Rebobina el reloj, si se pulsa repetidamente se rebobina hasta x3 \n");
+  printf ("a, A: Vuelve a la hora actual  \n");
   printf ("PgUp, PgDn: avanza y retrocede la cámara \n\n");
   printf ("+,-: avanza y retrocede la cámara \n\n");
   printf ("Teclas de movimiento de cursor: giran la camara\n");
@@ -87,7 +90,17 @@ void letra (unsigned char k, int x, int y)
 {
 
   switch (k)
-    {
+  {
+    case 'r':
+    case 'R':
+      setRebobinar(true);
+      setPreder(false); 
+      break;
+    case 'a':
+    case 'A':
+      setPreder(true); 
+      setRebobinar(false);
+      break;
     case 'P':
     case 'p':
       setModo(GL_POINT);
