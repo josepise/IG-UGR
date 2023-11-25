@@ -37,6 +37,7 @@ modulo modelo.c
 #include <math.h>
 #include <GL/glut.h>		// Libreria de utilidades de OpenGL
 #include "practicasIG.h"
+#include "lector-jpg.h"
 
 /**	void initModel()
 
@@ -47,15 +48,7 @@ Inicializa el modelo y de las variables globales
 
 int modo=GL_FILL;
 bool ilum=true;
-bool rebobinar=false;
-bool tomar_fecha=true;
-bool preder=false;
-bool sigue_gato=false;
-int factor_rebobinado=0;
-int hour_global;
-int min_global;
-int sec_global;
-float tras_gato=0.5;
+
 
 void
 initModel ()
@@ -87,7 +80,10 @@ class Malla:Objeto3D
     std::vector<std::vector<float>> normales;
     std::vector<std::vector<float>> normales_vert;
     std::vector<std::vector<int>> caras;
+    GLfloat colorDifusa[4];
+    GLfloat colorEspecular[4];
     float factor;
+    
 
   public:
 
@@ -133,24 +129,26 @@ class Malla:Objeto3D
    
   }
 
+  
+
+
   void draw()
   {
-
-      glBegin(GL_TRIANGLES);
+    glBegin(GL_TRIANGLES);
+    {
+      for(int i=0; i<caras.size(); i++)
       {
-        for(int i=0; i<caras.size(); i++)
-        {
-          normalCaras(vertices[caras[i][0]],vertices[caras[i][1]],vertices[caras[i][2]],i);
-            
-          glNormal3f(normales[i][0],normales[i][1],normales[i][2]);
+        normalCaras(vertices[caras[i][0]],vertices[caras[i][1]],vertices[caras[i][2]],i);
           
-          for(int j=0; j<3; j++)
-            glVertex3f(vertices[caras[i][j]][0],vertices[caras[i][j]][1],vertices[caras[i][j]][2]);
-        }
+        glNormal3f(normales[i][0],normales[i][1],normales[i][2]);
         
-
+        for(int j=0; j<3; j++)
+          glVertex3f(vertices[caras[i][j]][0],vertices[caras[i][j]][1],vertices[caras[i][j]][2]);
       }
-      glEnd();
+      
+
+    }
+    glEnd();
   }
 
   void draw_smooth()
@@ -176,6 +174,7 @@ class Malla:Objeto3D
     glEnd();
        
   }
+
 
   void normalCaras (std::vector<float> punto1,std::vector<float> punto2,std::vector<float> punto3, int cara)
   {
@@ -241,6 +240,22 @@ class Malla:Objeto3D
 
   }
 
+  void setReflecDifusa(float r, float g, float b)
+  {
+    colorDifusa[0]=r;
+    colorDifusa[1]=g;
+    colorDifusa[2]=b;
+    colorDifusa[3]=1.0;
+  }
+
+  void setReflecEspecular(float r, float g, float b)
+  {
+    colorEspecular[0]=r;
+    colorEspecular[1]=g;
+    colorEspecular[2]=b;
+    colorEspecular[3]=1.0;
+  }
+
 
   float getFactor()
   {
@@ -250,10 +265,138 @@ class Malla:Objeto3D
   
 };
 
+class Dado:public Malla
+{
+  private:
+    unsigned char * texels;
+    unsigned int ancho;
+    unsigned int alto;
+    std::vector<std::vector<float>> textura;
+    GLuint texId;
+
+  public:
+  
+    Dado() 
+    {
+      glBindTexture(GL_TEXTURE_2D, texId);
+      
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_CLAMP);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_CLAMP);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+
+      glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,ancho,alto,0,GL_RGB,GL_UNSIGNED_BYTE,texels);
+      vertices.push_back({0.0,0.0,0.0}); //0
+      textura.push_back({0,0.74707031});
+
+      vertices.push_back({0.0,0.0,1.0}); //1
+      textura.push_back({0.24804688,0.74707031});
+
+      vertices.push_back({0.0,1.0,1.0}); //2 
+      textura.push_back({0.24804688,0.50195313});
+
+      caras.push_back({0,1,2});
+      
+      vertices.push_back({0.0,1.0,0.0});  //3
+      textura.push_back({0,0.50195313});
+      
+      caras.push_back({0,2,3});
+
+      vertices.push_back({1.0,0.0,1.0}); //4
+      textura.push_back({0.49609375,0.74707031});
+
+      caras.push_back({1,4,2});
+
+      vertices.push_back({1.0,1.0,1.0});  //5 
+      textura.push_back({0.494140625,0.50195313});
+
+      caras.push_back({2,4,5});
+
+      vertices.push_back({1.0,0.0,0.0}); //6
+      textura.push_back({0.7431606,0.74707031});
+
+      vertices.push_back({1.0,1.0,0.0});  //7
+      textura.push_back({0.7431606,0.50195313});
+
+      caras.push_back({5,4,7});
+      caras.push_back({7,4,6});
+
+      vertices.push_back({0.0,0.0,0.0});//0
+      textura.push_back({0.99316406,0.74707031});
+
+      vertices.push_back({0.0,1.0,0.0});//3
+      textura.push_back({0.99316406,0.50195313});
+
+      caras.push_back({6,8,9});
+      caras.push_back({6,9,7});
+      
+      vertices.push_back({0.0,1.0,0.0});//3
+      textura.push_back({0.74023438,0.25390625});
+      
+      caras.push_back({10,5,7});
+
+      vertices.push_back({0.0,1.0,1.0});//2
+      textura.push_back({0.49609375,0.25390625});
+
+      caras.push_back({10,11,5});
+
+      vertices.push_back({0.0,0.0,0.0});
+      textura.push_back({0.7421875,0.99609375});
+      
+      vertices.push_back({0.0,0.0,1.0});
+      textura.push_back({0.495117188,0.99609375});
+
+      caras.push_back({12,4,13});
+      caras.push_back({12,6,4});
+
+      setReflecDifusa(0.8,0.8,0.8);
+      setReflecEspecular(0,0,0);
+
+      for(int i=0; i<caras.size(); i++)
+        normales.push_back({0,0,0});
+    }
+
+
+    void draw_text()
+    {
+      glMaterialfv(GL_FRONT, GL_DIFFUSE, colorDifusa);
+      glMaterialfv(GL_FRONT, GL_SPECULAR, colorEspecular);
+
+      glEnable(GL_TEXTURE_2D);
+      
+      glBegin(GL_TRIANGLES);
+      {
+        for(int i=0; i<caras.size(); i++)
+        {
+          normalCaras(vertices[caras[i][0]],vertices[caras[i][1]],vertices[caras[i][2]],i);
+            
+          glNormal3f(normales[i][0],normales[i][1],normales[i][2]);
+          for(int j=0; j<3; j++)
+          {
+            glTexCoord2f(textura[caras[i][j]][0],textura[caras[i][j]][1]);
+            glVertex3f(vertices[caras[i][j]][0],vertices[caras[i][j]][1],vertices[caras[i][j]][2]);
+          }
+        }
+      }
+      glEnd();
+
+      glDisable(GL_TEXTURE_2D);
+
+    }
+
+    
+  void aniadirTextura(unsigned int anch, unsigned int alt, const char * fichero_textura)
+  {
+    texels=LeerArchivoJPEG(fichero_textura, anch,alt);
+    glGenTextures(1,&texId);
+    alto=alt;
+    ancho=anch;
+  }
+};
 
 class Revolucion:public Malla
 {
-    private:
+    protected:
       std::vector<std::vector<float>> vertices_iniciales;
       int revoluciones;
 
@@ -278,9 +421,6 @@ class Revolucion:public Malla
         }
       }
       vertices_iniciales=vertices_tmp;
-    
-
-      
 
       for(int i=0; i<n; i++)
       {
@@ -343,6 +483,11 @@ class Revolucion:public Malla
     }
 };
 
+class Lata:public Revolucion
+{
+  
+};
+
 class Ejes:Objeto3D 
 { 
   public: 
@@ -371,278 +516,13 @@ class Ejes:Objeto3D
 }; 
 
 
-char * cilindro="./ply/cilindro.ply";
-char * posa_agujas="./ply/posa_agujas.ply";
-char * aguja_min="./ply/flecha1.ply";
-char * aguja_hora="./ply/flecha2.ply";
-char * aguja_segundos="./ply/flecha3.ply";
-char * gato="./ply/fatcat.ply";
-
+const char * lect="./texturas/dado.jpg";
+Dado dado;
 Ejes ejesCoordenadas;
-Revolucion cilindro_obj (cilindro,(int)30);
-Malla reposa (posa_agujas,1);
-Malla aguja_min_obj (aguja_min,0.05);
-Malla aguja_hora_obj (aguja_hora,0.05);
-Malla aguja_sec_obj (aguja_segundos,1);
-Malla cat (gato,0.025);
-
-int get_seconds()
-{
-  std::time_t time_now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  std::tm local_time = *std::localtime(&time_now);
-  int seconds = local_time.tm_sec;
-  return seconds;
-}
-
-int get_minutes()
-{
-  std::time_t time_now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  std::tm local_time = *std::localtime(&time_now);
-  int minutes = local_time.tm_min;
-  return minutes;
-}
-int get_hour()
-{
-  std::time_t time_now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  std::tm local_time = *std::localtime(&time_now);
-  int hour = local_time.tm_hour;
-  return hour;
-} 
-
-void setRebobinar(bool modo)
-{
-  if(!rebobinar)
-  { 
-    tomar_fecha=true;
-  }
-  rebobinar=modo;
-
-  if(factor_rebobinado<=3)
-    factor_rebobinado++;
-
-}
-
-void setPreder(bool modo)
-{
-  if(modo==true)
-    factor_rebobinado=0;
-  preder=modo;
-}
 
 
 
-std::vector<int> hora_rebobinado()
-{
-  std::vector<int> la_hora;
-  if(tomar_fecha)
-  {
-    hour_global=get_hour();
-    min_global=get_minutes();
-    sec_global=get_seconds();
-    tomar_fecha=false;
-  }
 
-  if(min_global<=0 && sec_global<=0)
-  {
-    min_global=59;
-    sec_global=59;
-    hour_global-=1;
-  }
-  else if(sec_global<=0)
-  {
-    min_global-=1;
-    sec_global=59;
-  }
-  else
-  {
-    sec_global=sec_global-(10*factor_rebobinado);
-  }
-
-  la_hora.push_back(hour_global);
-  la_hora.push_back(min_global);
-  la_hora.push_back(sec_global);
-
-  return la_hora;
-}
-
-std::vector<int> volver_hora_preder()
-{
-  std::vector<int> la_hora;
-  
-  if(hour_global!=get_hour() || min_global!=get_minutes() || sec_global!=get_seconds())
-  {
-    if(sec_global!=get_seconds())
-      sec_global=(sec_global+1)%60;
-
-    if(min_global!=get_minutes()) 
-        min_global=(min_global+1)%60;
-
-    if(hour_global!=get_hour())
-    {
-      if(abs(hour_global-get_hour())>=1)
-        hour_global=hour_global+1%24;
-      else
-        hour_global+=(360/60*get_minutes())/12;
-    }
-    la_hora.push_back(hour_global);
-    la_hora.push_back(min_global);
-    la_hora.push_back(sec_global);
-  }
-  else
-  {
-    preder=false;
-    la_hora.push_back(get_hour());
-    la_hora.push_back(get_minutes());
-    la_hora.push_back(get_seconds());
-  }
-
-  return la_hora;
-}
-
-std::vector<int> devuelve_hora()
-{
-  std::vector<int> la_hora;
-  if (rebobinar)
-    la_hora=hora_rebobinado();
-  else if (preder)
-    la_hora=volver_hora_preder();
-  else
-  {
-    la_hora.push_back(get_hour());
-    la_hora.push_back(get_minutes());
-    la_hora.push_back(get_seconds());
-  }
-
-  if(la_hora[1]==0)
-  { 
-    sigue_gato=true;
-  }
-
-  if(tras_gato>0 || sigue_gato)
-  {
-    if(tras_gato<2 && sigue_gato)
-      tras_gato+=0.5;
-    else if(tras_gato>0.5 && !sigue_gato)
-      tras_gato-=0.5;
-
-    if (tras_gato==2)
-      sigue_gato=false;
-  }
-
-
-  
-  return la_hora;
-}
-
-void Base()
-{
-  float color[4] = { 0.0, 0.5, 0.7, 1 };
-  glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, color);
-  cilindro_obj.draw();
-}
-
-void Reposa_Agujas()
-{ 
-  float color[4] = { 0.0, 0.5, 0.15, 1 };
-  glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, color);
-  reposa.draw();
-}
-
-void Aguja_min()
-{
-  float color[4] = { 0.0, 0.9, 0.9, 1 };
-  glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, color);
-  aguja_min_obj.draw();
-}
-
-void Aguja_hora()
-{
-  float color[4] = { 0.9, 0.0, 0.9, 1 };
-  glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, color);
-  aguja_hora_obj.draw();
-}
-
-void Aguja_segundos()
-{
-  float color[4] = { 0.9, 0.0, 0.0, 1 };
-  glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, color);
-  aguja_sec_obj.draw();
-}
-
-void Gato()
-{
-  float color[4] = { 0.9, 0.0, 0.0, 1 };
-  glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, color);
-  cat.draw();
-}
-
-void Reloj()
-{
-  std::vector<int> la_hora=devuelve_hora();
-
-  glPushMatrix();
-    glRotatef(90,1,0,0);
-    Base();
-  glPopMatrix();
- 
-  glPushMatrix();
-    glPushMatrix();
-      glTranslatef(-0.5,3.5,0.5);
-      Reposa_Agujas();
-    glPopMatrix();
-  
-    glPushMatrix();
-      glRotatef(-90,0,0,1);
-      glTranslatef(-0.5,3.5,0.5);
-      Reposa_Agujas();
-    glPopMatrix();
-
-    glPushMatrix();
-      glRotatef(-180,0,0,1);
-      glTranslatef(-0.5,3.5,0.5);
-      Reposa_Agujas();
-    glPopMatrix();
-
-    glPushMatrix();
-      glRotatef(-270,0,0,1);
-      glTranslatef(-0.5,3.5,0.5);
-      Reposa_Agujas();
-    glPopMatrix();
-    
-    glPushMatrix();
-
-      glPushMatrix();
-        glTranslatef(0.0,3.0,tras_gato);
-        glRotatef(90,0.0,1.0,0.0);
-        Gato();
-      glPopMatrix();  
-
-      glTranslatef(0,0,1.25);
-      glRotatef(-90,1,0,0);
-     
-      glPushMatrix();
-        glRotatef(360/60*la_hora[1]+(360/60*la_hora[2])/60,0,1,0);
-        glTranslatef(-10.30*aguja_min_obj.getFactor(),-0.02,-18.94*aguja_min_obj.getFactor());
-        Aguja_min();
-      glPopMatrix();
-      
-      glPushMatrix();
-        glRotatef(360/12*la_hora[0]+(360/60*la_hora[1])/12,0,1,0);
-        glTranslatef(-8.23*aguja_hora_obj.getFactor(),0,-99.2*aguja_hora_obj.getFactor());
-        Aguja_hora();
-      glPopMatrix();
-    
-      glPushMatrix();
-        glRotatef(360/60*la_hora[2],0,1,0);
-        glTranslatef(-0.015,0,0);
-        Aguja_segundos();
-      glPopMatrix();
-    
-    glPopMatrix();
-
-    
-  glPopMatrix();
-}
 
 /**	void Dibuja( void )
 
@@ -684,8 +564,9 @@ void Dibuja (void)
       break;
   }
 
-  glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, color2);
-  Reloj();
+  dado.aniadirTextura(1024,1024,lect);
+  dado.draw_text();
+  
   
   glPopMatrix ();		// Desapila la transformacion geometrica
 

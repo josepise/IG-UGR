@@ -91,16 +91,6 @@ void letra (unsigned char k, int x, int y)
 
   switch (k)
   {
-    case 'r':
-    case 'R':
-      setRebobinar(true);
-      setPreder(false); 
-      break;
-    case 'a':
-    case 'A':
-      setPreder(true); 
-      setRebobinar(false);
-      break;
     case 'P':
     case 'p':
       setModo(GL_POINT);
